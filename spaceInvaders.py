@@ -8,6 +8,8 @@ Language : python3
 
 import pygame
 import sys
+
+import utils
 from updates import (movement, fire_bullet, collision, render_enemy, player_movement,
                      DISPLAY_WIDTH, DISPLAY_HEIGHT, SURFACE_WIDTH, SURFACE_HEIGHT)
 from entities import Player, Bullet, Enemy
@@ -98,6 +100,18 @@ class Game:
                 self.enemy_obj.enemy_img = self.enemy_obj.render(self.enemy_obj)
             self.display.blit(self.enemy_obj.enemy_img, enemy[0])
 
+    def gameover(self):
+        self.lives -= 1
+        if self.lives == 0:
+            pass
+        else:
+            display = pygame.Surface((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+            font = pygame.font.Font(None, 36)
+            text = font.render("Game Over", True, (0, 0, 0))
+            display.blit(text, (DISPLAY_WIDTH // 2 - 50, DISPLAY_HEIGHT // 2))
+            self.screen.blit(display, (0, 0))
+            pygame.display.update()
+
     def run(self):
         # game loop to display window
         while True:
@@ -116,7 +130,13 @@ class Game:
             player_movement(self.player_obj, self.bullet_obj)
             movement(self.enemy_obj)
             fire_bullet(self.bullet_obj, self.player_obj)
-            self.score += collision(self.bullet_obj, self.enemy_obj, self.player_obj)
+            score_increment, player_collision = collision(self.bullet_obj, self.enemy_obj,
+                                                          self.player_obj)
+            self.score += score_increment
+            if player_collision:
+                self.gameover()
+                pygame.time.wait(2000)
+                return self.lives
 
             # Blit display to screen
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
@@ -131,4 +151,14 @@ class Game:
 
 if __name__ == '__main__':
     game = Game()
-    game.run()
+    lives = game.run()
+    while lives > 0:
+        # Give choice to play again
+        choice = utils.try_again(game)
+        if choice == 1:
+            game = Game()
+            lives = game.run()
+        else:
+            utils.goodbye()
+            pygame.quit()
+            sys.exit()
