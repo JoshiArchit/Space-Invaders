@@ -165,7 +165,8 @@ class Game:
                 color = (255, 0, 0) if isalive else (0, 0, 0)
                 if isalive:
                     pygame.draw.rect(self.display, color, enemy)
-            # # Update every enemy's position
+
+            # Object update functions
             self.movement()
             self.fire_bullet()
             self.collision()
