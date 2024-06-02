@@ -107,3 +107,20 @@ def render_enemy():
             enemies.pop(counter)
             return enemies
         counter += 1
+
+
+def player_movement(game):
+    """
+    Helper function to move the player object.
+    :return: None
+    """
+    # Move player
+    if game.move_left and game.player.left > 0:
+        game.player.x -= game.player_speed
+    if game.move_right and game.player.right < SURFACE_WIDTH:
+        game.player.x += game.player_speed
+
+    # Update bullet position with player's position
+    if not game.bullet_fired:
+        game.bullet.x = game.player.centerx - 2
+        game.bullet.y = game.player.centery
