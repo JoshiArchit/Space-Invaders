@@ -85,6 +85,7 @@ class Game:
             # Render objects
             pygame.draw.rect(self.display, (255, 255, 255), self.player)
             pygame.draw.rect(self.display, (0, 255, 0), self.bullet)
+            # # ORIGINAL enemies dictionary to store enemy objects and alive status
             # for enemy, isalive in self.enemies.values():
             #     color = (255, 0, 0) if isalive else (0, 0, 0)
             #     if isalive:
