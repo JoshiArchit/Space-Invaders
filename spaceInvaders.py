@@ -29,24 +29,38 @@ class Game:
         # Enemy rectangle (top-left = 20, bottom-left=50, width & height = 20)
         self.enemy_pos = (20, 50)
         self.enemy = pygame.Rect(20, 50, 20, 20)
-        self.enemy_speed = 5  # Will move continuously
+        self.enemy_speed = 10  # Will move continuously
+        # Todo: Reduce frames as difficulty increases
+        self.enemy_update_delay = 25 # Number of frames between each movement
+        self.enemy_update_counter = 0
 
         # Player rectangle (top-left = 150, bottom-left = 200, width & height = 20)
         self.player_pos = (150, 200)
         self.player = pygame.Rect(150, 200, 20, 20)
         self.player_speed = 5
 
-    def movement(self, dt):
-        # Move enemy continuously (speed = distance/time ; distance = speed * time)
-        self.enemy.x += self.enemy_speed * dt
-        if self.enemy.x < 0:
-            # Reached left bound, bounce to right
-            self.enemy.x = 0
-            self.enemy_speed = abs(self.enemy_speed)
-        elif self.enemy.x >= SURFACE_WIDTH - self.enemy.width:
-            # Reached right bound, bounce to left
-            self.enemy.x = SURFACE_WIDTH - self.enemy.width
-            self.enemy_speed = -abs(self.enemy_speed)
+    # def movement(self, dt):
+    #     # Move enemy continuously (speed = distance/time ; distance = speed * time)
+    #     self.enemy.x += self.enemy_speed * dt
+    #     if self.enemy.x < 0:
+    #         # Reached left bound, bounce to right
+    #         self.enemy.x = 0
+    #         self.enemy_speed = abs(self.enemy_speed)
+    #     elif self.enemy.x >= SURFACE_WIDTH - self.enemy.width:
+    #         # Reached right bound, bounce to left
+    #         self.enemy.x = SURFACE_WIDTH - self.enemy.width
+    #         self.enemy_speed = -abs(self.enemy_speed)
+    def movement(self):
+        self.enemy_update_counter += 1
+        if self.enemy_update_counter >= self.enemy_update_delay:
+            self.enemy_update_counter = 0
+            self.enemy.x += self.enemy_speed
+            if self.enemy.left < 0:
+                self.enemy.x = 0
+                self.enemy_speed = abs(self.enemy_speed)
+            elif self.enemy.right >= SURFACE_WIDTH:
+                self.enemy.right = SURFACE_WIDTH
+                self.enemy_speed = -abs(self.enemy_speed)
 
     def run(self):
         # game loop to display window
@@ -66,11 +80,12 @@ class Game:
             pygame.draw.rect(self.display, (255, 255, 255), self.player)
             pygame.draw.rect(self.display, (255, 0, 0), self.enemy)
 
-            # Get displacement for enemy movements
-            current_time = pygame.time.get_ticks()
-            delta_time = (current_time - last_time) / 100
-            last_time = current_time
-            self.movement(delta_time)
+            # # Get displacement for enemy movements
+            # current_time = pygame.time.get_ticks()
+            # delta_time = (current_time - last_time) / 100
+            # last_time = current_time
+            # self.movement(delta_time)
+            self.movement()
 
             # Blit display to screen
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
