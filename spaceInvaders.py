@@ -87,8 +87,16 @@ class Game:
             (0, 255, 0),
             self.bullet_obj.bullet
         )
-        # Blit enemies
+        # Todo: Different enemy images for each wave
+        # Get starting indexes for each wave
+        enemy_per_wave = len(self.enemy_obj.enemies) // self.enemy_obj.waves
+        row_start = [i * enemy_per_wave for i in range(self.enemy_obj.waves)]
+
         for enemy in self.enemy_obj.enemies:
+            # If end of current wave is reached, print DONE before moving to next row
+            if self.enemy_obj.enemies.index(enemy) in row_start:
+                # Cycle through enemy types and render different sprite
+                self.enemy_obj.enemy_img = self.enemy_obj.render(self.enemy_obj)
             self.display.blit(self.enemy_obj.enemy_img, enemy[0])
 
     def run(self):
@@ -117,6 +125,8 @@ class Game:
             self.scoreboard()
             # Update display and cap refresh rate
             pygame.display.update()
+            # Reset enemy type after every wave to keep rendering consistent at each refresh
+            self.enemy_obj.current_type = 1
             self.clock.tick(60)
 
 
