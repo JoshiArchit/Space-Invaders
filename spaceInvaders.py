@@ -8,6 +8,7 @@ Language : python3
 
 import pygame
 import sys
+from updates import movement, fire_bullet, collision, scorebar, render_enemy
 
 DISPLAY_WIDTH = 640
 DISPLAY_HEIGHT = 480
@@ -27,7 +28,7 @@ class Game:
         self.clock = pygame.time.Clock()
 
         # Enemy rectangle (top-left = 20, bottom-left=50, width & height = 20)
-        self.enemies = self.render_enemy()
+        self.enemies = render_enemy()
         self.enemy_speed = 2  # Will move continuously
         self.alive_enemies = len(self.enemies) * [True]
         # Todo: Reduce frames as difficulty increases
@@ -47,91 +48,6 @@ class Game:
         # Score
         self.score = 0
         self.lives = 3
-
-    def render_enemy(self):
-        """
-        Helper to create a list of enemy objects (Rectangles) on screen.
-        The list will have gaps between each enemy.
-        If collision is detected, remove the enemy from the list.
-        :return:
-        """
-        # enemies dictionary to store enemy objects and alive status
-        enemies = dict()
-        enemy_y = 50
-        enemy_x = 15
-        counter = 0
-        while True:
-            enemies[counter] = (pygame.Rect(enemy_x, enemy_y, 10, 10), True)
-            enemy_x += enemies[counter][0].width + 10
-            if enemy_x >= SURFACE_WIDTH or enemies[counter][0].right > SURFACE_WIDTH:
-                enemies.pop(counter)
-                return enemies
-            counter += 1
-
-    def movement(self):
-        """
-        Helper function for jagged enemy movement.
-        :return: None
-        """
-        self.enemy_update_counter += 1
-        if self.enemy_update_counter >= self.enemy_update_delay:
-            self.enemy_update_counter = 0
-
-            # Check the leftmost and rightmost enemies
-            leftmost_enemy = self.enemies[min(self.enemies.keys())][0]
-            rightmost_enemy = self.enemies[max(self.enemies.keys())][0]
-
-            # Doesnt matter if they are alive or dead. They will move together. Alive or dead is
-            # handled in collision
-            for enemy, info in self.enemies.items():
-                enemy_rect = info[0]  # Rect object is the first element in the tuple
-                enemy_rect.x += self.enemy_speed
-
-            # Check if the leftmost enemy has hit the left wall
-            if leftmost_enemy.left <= 0:
-                self.enemy_speed = abs(self.enemy_speed)
-                for enemy, info in self.enemies.items():
-                    enemy_rect = info[0]
-                    enemy_rect.y += 10
-            # Check if the rightmost enemy has hit the right wall
-            elif rightmost_enemy.right >= SURFACE_WIDTH:
-                self.enemy_speed = -abs(self.enemy_speed)
-                for enemy, info in self.enemies.items():
-                    enemy_rect = info[0]
-                    enemy_rect.y += 10
-
-    def fire_bullet(self):
-        """
-        Helper function to fire a bullet from the player object.
-        :return: None
-        """
-        if self.bullet_fired:
-            # Move bullet up (subtract speed)
-            self.bullet.y -= self.bullet_speed
-            # Out of bounds condition
-            if self.bullet.top <= 0:
-                self.bullet_fired = False
-                # Reset y to player center
-                self.bullet.y = self.player.centery
-
-    def collision(self):
-        """
-        Helper function to detect collision between bullet and enemies. Successful collision
-        removes enemy from list.
-
-        :return: None
-        """
-        if self.bullet_fired:
-            for enemy, enemy_info in self.enemies.items():
-                rect_enemy, isalive = enemy_info
-                if rect_enemy.colliderect(self.bullet) and isalive:
-                    self.bullet_fired = False
-                    self.bullet.y = self.player.centery
-                    # Remove enemy from list
-                    self.enemies[enemy] = (rect_enemy, False)
-
-    def scorebar(self):
-        pass
 
     def game_over(self):
         pass
@@ -166,11 +82,16 @@ class Game:
                 if isalive:
                     pygame.draw.rect(self.display, color, enemy)
 
-            # Object update functions
-            self.movement()
-            self.fire_bullet()
-            self.collision()
-            self.game_over()
+            # # Object update functions
+            # self.movement()
+            # self.fire_bullet()
+            # self.collision()
+            # self.scorebar()
+            # self.game_over()
+            movement(game)
+            fire_bullet(game)
+            collision(game)
+            scorebar(game)
 
             # Blit display to screen
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
