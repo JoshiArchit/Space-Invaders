@@ -17,9 +17,8 @@ from entities import Player, Bullet, Enemy
 
 class Game:
     # Game class. Handle window dimensions, object dimensions.
-    # Todo: Create classes for Player and Enemies later
 
-    def __init__(self):
+    def __init__(self, next_level=False, current_waves=3):
         pygame.init()
         pygame.display.set_caption("PyGame Space Invaders")
         self.screen = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
@@ -31,7 +30,7 @@ class Game:
         # Bullet initialization
         self.bullet_obj = Bullet(self.player_obj.player)
         # Enemy rectangle (top-left = 20, bottom-left=50, width & height = 20)
-        self.enemy_obj = Enemy()
+        self.enemy_obj = Enemy(current_waves)
 
         # Score and lives
         self.score = 0
@@ -84,11 +83,13 @@ class Game:
             self.player_obj.player_img,
             (self.player_obj.player.x, self.player_obj.player.y)
         )
+
         pygame.draw.rect(
             self.display,
             (0, 255, 0),
             self.bullet_obj.bullet
         )
+
         # Get starting indexes for each wave
         enemy_per_wave = len(self.enemy_obj.enemies) // self.enemy_obj.waves
         row_start = [i * enemy_per_wave for i in range(self.enemy_obj.waves)]
@@ -115,9 +116,11 @@ class Game:
     def run(self):
         # game loop to display window
         while True:
-            if self.lives == 0:
-                pygame.quit()
-                sys.exit()
+            # Check if all enemies are destroyed
+            if not self.enemy_obj.enemies:
+                # Reset enemies
+                print("All enemies destroyed")
+                return -1
 
             self.display.fill((0, 0, 0))
 
@@ -149,16 +152,30 @@ class Game:
             self.clock.tick(60)
 
 
+def playgame(new_game):
+    # Todo : what after you win?
+    lives = new_game.run()
+    current_waves = new_game.enemy_obj.waves
+    while lives > 0 or lives == -1:
+        if lives == -1:
+            print("winner")
+            # Player has won
+            play_next = utils.winner(new_game)
+            if play_next:
+                new_game = Game(next_level=True, current_waves=current_waves + 1)
+                lives = new_game.run()
+        else:
+            # Give choice to play again
+            choice = utils.try_again(new_game)
+            if choice:
+                game = Game()
+                lives = game.run()
+            else:
+                utils.goodbye()
+                pygame.quit()
+                sys.exit()
+
+
 if __name__ == '__main__':
     game = Game()
-    lives = game.run()
-    while lives > 0:
-        # Give choice to play again
-        choice = utils.try_again(game)
-        if choice == 1:
-            game = Game()
-            lives = game.run()
-        else:
-            utils.goodbye()
-            pygame.quit()
-            sys.exit()
+    playgame(game)
