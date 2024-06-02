@@ -13,9 +13,6 @@ from updates import (movement, fire_bullet, collision, render_enemy, player_move
 from entities import Player, Bullet, Enemy
 
 
-
-
-
 class Game:
     # Game class. Handle window dimensions, object dimensions.
     # Todo: Create classes for Player and Enemies later
@@ -58,6 +55,42 @@ class Game:
         # Blit the scoreboard to the screen
         self.screen.blit(score_display, (0, 0))
 
+    def check_events(self):
+        for event in pygame.event.get():
+            # QUIT event
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            # Bullet fire event
+            # Player movement events
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and not self.bullet_obj.bullet_fired:
+                    self.bullet_obj.bullet_fired = True
+                if event.key == pygame.K_LEFT:
+                    self.player_obj.move_left = True
+                elif event.key == pygame.K_RIGHT:
+                    self.player_obj.move_right = True
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT:
+                    self.player_obj.move_left = False
+                elif event.key == pygame.K_RIGHT:
+                    self.player_obj.move_right = False
+
+    def render_objects(self):
+        # Blit player and bullet
+        self.display.blit(
+            self.player_obj.player_img,
+            (self.player_obj.player.x, self.player_obj.player.y)
+        )
+        pygame.draw.rect(
+            self.display,
+            (0, 255, 0),
+            self.bullet_obj.bullet
+        )
+        # Blit enemies
+        for enemy in self.enemy_obj.enemies:
+            self.display.blit(self.enemy_obj.enemy_img, enemy[0])
+
     def run(self):
         # game loop to display window
         while True:
@@ -65,44 +98,12 @@ class Game:
                 pygame.quit()
                 sys.exit()
 
-            # Check for events
-            for event in pygame.event.get():
-                # QUIT event
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-                # Bullet fire event
-                # Player movement events
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE and not self.bullet_obj.bullet_fired:
-                        self.bullet_obj.bullet_fired = True
-                    if event.key == pygame.K_LEFT:
-                        self.player_obj.move_left = True
-                    elif event.key == pygame.K_RIGHT:
-                        self.player_obj.move_right = True
-                if event.type == pygame.KEYUP:
-                    if event.key == pygame.K_LEFT:
-                        self.player_obj.move_left = False
-                    elif event.key == pygame.K_RIGHT:
-                        self.player_obj.move_right = False
-
-                # Todo: Movement code
-
-            # Rendering block - Pay attention to the hierarchy of rendering and the objects
             self.display.fill((0, 0, 0))
-            # Blit player and bullet
-            self.display.blit(
-                self.player_obj.player_img,
-                (self.player_obj.player.x, self.player_obj.player.y)
-            )
-            pygame.draw.rect(
-                self.display,
-                (0, 255, 0),
-                self.bullet_obj.bullet
-            )
-            # Blit enemies
-            for enemy in self.enemy_obj.enemies:
-                self.display.blit(self.enemy_obj.enemy_img, enemy[0])
+
+            # Check for events
+            self.check_events()
+            # Render objects
+            self.render_objects()
 
             # Object update functions : Check updates.py
             player_movement(self.player_obj, self.bullet_obj)
