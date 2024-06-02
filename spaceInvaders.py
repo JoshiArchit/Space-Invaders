@@ -94,6 +94,24 @@ class Game:
                 # Reset y to player center
                 self.bullet.y = self.player.centery
 
+    def collision(self):
+        """
+        Helper function to detect collision between bullet and enemies. Successful collision
+        removes enemy from list.
+
+        :return: None
+        """
+        if self.bullet_fired:
+            for enemy in self.enemies:
+                # Check collision only if bullet was fired
+                if enemy.colliderect(self.bullet):
+                    self.enemies.remove(enemy)
+                    self.bullet_fired = False
+                    # Reset bullet position
+                    self.bullet.y = self.player.centery
+
+
+
     def run(self):
         # game loop to display window
         while True:
@@ -121,6 +139,7 @@ class Game:
             # Update every enemy's position
             self.movement()
             self.firebullet()
+            self.collision()
 
             # Blit display to screen
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
