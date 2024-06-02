@@ -6,9 +6,7 @@ Description :
 Language : python3
 """
 import sys
-
 import pygame
-
 from updates import DISPLAY_WIDTH, DISPLAY_HEIGHT
 
 

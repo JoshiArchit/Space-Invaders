@@ -18,7 +18,7 @@ from entities import Player, Bullet, Enemy
 class Game:
     # Game class. Handle window dimensions, object dimensions.
 
-    def __init__(self, next_level=False, current_waves=3):
+    def __init__(self, next_level=False, current_waves=3, current_enemies_per_wave=8):
         pygame.init()
         pygame.display.set_caption("PyGame Space Invaders")
         self.screen = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
@@ -30,8 +30,8 @@ class Game:
         # Bullet initialization
         self.bullet_obj = Bullet(self.player_obj.player)
         # Enemy rectangle (top-left = 20, bottom-left=50, width & height = 20)
-        self.enemy_obj = Enemy(current_waves)
-
+        self.enemy_obj = Enemy(current_waves, current_enemies_per_wave)
+        print("Current waves = ", current_waves)
         # Score and lives
         self.score = 0
         self.lives = 3
@@ -156,13 +156,15 @@ def playgame(new_game):
     # Todo : what after you win?
     lives = new_game.run()
     current_waves = new_game.enemy_obj.waves
+    current_enemies_per_wave = new_game.enemy_obj.num_enemies_per_wave
     while lives > 0 or lives == -1:
         if lives == -1:
             print("winner")
             # Player has won
             play_next = utils.winner(new_game)
             if play_next:
-                new_game = Game(next_level=True, current_waves=current_waves + 1)
+                print("Current waves = ", current_waves)
+                new_game = Game(next_level=True, current_waves=current_waves + 1, current_enemies_per_wave=current_enemies_per_wave + 3)
                 lives = new_game.run()
         else:
             # Give choice to play again

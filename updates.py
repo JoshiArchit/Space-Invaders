@@ -81,7 +81,32 @@ def collision(bullet_obj, enemy_obj, player_obj):
     return 0, False
 
 
-def render_enemy(waves):
+# def render_enemy(waves):
+#     """
+#     Helper to create a list of enemy objects (Rectangles) on screen.
+#     The list will have gaps between each enemy.
+#     If collision is detected, remove the enemy from the list.
+#     :return:
+#     """
+#     # List of enemies
+#     enemies = list()
+#     enemy_y = 50
+#     enemy_x = 15
+#     index = 0
+#
+#     while waves > 0:
+#         while True:
+#             enemies.append((pygame.Rect(enemy_x, enemy_y, 10, 10), True))
+#             enemy_x += enemies[index][0].width + 10
+#             if enemy_x >= SURFACE_WIDTH or enemies[index][0].right > SURFACE_WIDTH:
+#                 enemies.pop(index)
+#                 break
+#             index += 1
+#         enemy_y += 20
+#         enemy_x = 15
+#         waves -= 1
+#     return enemies
+def render_enemy(waves, num_enemies_per_wave):
     """
     Helper to create a list of enemy objects (Rectangles) on screen.
     The list will have gaps between each enemy.
@@ -95,18 +120,19 @@ def render_enemy(waves):
     index = 0
 
     while waves > 0:
-        while True:
+        pointer = num_enemies_per_wave
+        while pointer > 0:
             enemies.append((pygame.Rect(enemy_x, enemy_y, 10, 10), True))
             enemy_x += enemies[index][0].width + 10
             if enemy_x >= SURFACE_WIDTH or enemies[index][0].right > SURFACE_WIDTH:
                 enemies.pop(index)
                 break
             index += 1
+            pointer -= 1
         enemy_y += 20
         enemy_x = 15
         waves -= 1
     return enemies
-
 
 def player_movement(player_obj, bullet_obj):
     """
