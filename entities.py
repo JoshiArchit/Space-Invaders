@@ -31,14 +31,35 @@ class Player:
 class Enemy:
     def __init__(self):
         # Enemy rectangle (top-left = 20, bottom-left=50, width & height = 20)
-        self.enemy_img = pygame.image.load('assets/green.png')
+        self.assets = {
+            '1': pygame.image.load('assets/green.png'),
+            '2': pygame.image.load('assets/red.png'),
+            '3': pygame.image.load('assets/yellow.png')
+        }
+        self.width, self.height = 10, 10
+        self.enemy_img = self.assets['1']
         self.enemy_img.set_colorkey((0, 0, 0))
-        self.enemy_img = pygame.transform.scale(self.enemy_img, (10, 10))
-        self.enemies = render_enemy()
+        self.waves = 4
+        self.enemies = render_enemy(self.waves)
         self.enemy_speed = 2  # Will move continuously
         # Todo: Reduce frames as difficulty increases
         self.enemy_update_delay = 25  # Number of frames between each movement
         self.enemy_update_counter = 0
+        self.current_type = 1
+
+    def render(self, enemy_obj):
+        enemy_types = len(self.assets)
+        if self.current_type > enemy_types:
+            self.current_type = 1
+
+        if self.current_type <= enemy_types:
+            enemy_obj.enemy_img = enemy_obj.assets[str(self.current_type)]
+            self.current_type += 1
+
+        return pygame.transform.scale(
+                    enemy_obj.enemy_img,
+                    (self.width, self.height)
+        )
 
 
 class Bullet:
