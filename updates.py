@@ -81,8 +81,13 @@ def collision(bullet_obj, enemy_obj, player_obj):
                 bullet_obj.bullet_fired = False
                 bullet_obj.bullet.y = player_obj.player.centery
                 enemy_obj.enemies.remove(enemy)
-                return 1
-    return 0
+                return 1, False
+
+    for enemy in enemy_obj.enemies:
+        if enemy[0].colliderect(player_obj.player):
+            return 0, True
+
+    return 0, False
 
 
 def render_enemy(waves):
