@@ -34,8 +34,14 @@ class Game:
         self.enemy_update_counter = 0
 
         # Player rectangle (top-left = 150, bottom-left = 200, width & height = 20)
-        self.player = pygame.Rect(150, 200, 10, 10)
+        self.player = pygame.Rect(150, 200, 25, 15)
         self.player_speed = 5
+
+        # Bullet initialization
+        self.bullet = pygame.Rect(self.player.centerx - 2, self.player.centery, 5,
+                                  self.player.height // 2)
+        self.bullet_speed = 5
+        self.bullet_fired = False
 
     def render_enemy(self):
         """
@@ -74,6 +80,20 @@ class Game:
                     enemy.right = SURFACE_WIDTH
                     self.enemy_speed = -abs(self.enemy_speed)
 
+    def firebullet(self):
+        """
+        Helper function to fire a bullet from the player object.
+        :return: None
+        """
+        if self.bullet_fired:
+            # Move bullet up (subtract speed)
+            self.bullet.y -= self.bullet_speed
+            # Out of bounds condition
+            if self.bullet.top <= 0:
+                self.bullet_fired = False
+                # Reset y to player center
+                self.bullet.y = self.player.centery
+
     def run(self):
         # game loop to display window
         while True:
@@ -83,17 +103,24 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
+                # Bullet fire event
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE and self.bullet_fired is False:
+                        self.bullet_fired = True
                 # Todo: Movement code
 
             # Fill display with black color
             self.display.fill((0, 0, 0))
-            # Display player and enemy on display
+
+            # Render objects
             pygame.draw.rect(self.display, (255, 255, 255), self.player)
+            pygame.draw.rect(self.display, (0, 255, 0), self.bullet)
             # Todo: Needs to have a separate render enemy function that renders list of enemies
             for enemy in self.enemies:
                 pygame.draw.rect(self.display, (255, 0, 0), enemy)
             # Update every enemy's position
             self.movement()
+            self.firebullet()
 
             # Blit display to screen
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
