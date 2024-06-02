@@ -65,15 +65,6 @@ def collision(bullet_obj, enemy_obj, player_obj):
 
     :return: None
     """
-    # Original collision detection with dictionary
-    # if game.bullet_fired:
-    #     for enemy, enemy_info in game.enemies.items():
-    #         rect_enemy, isalive = enemy_info
-    #         if rect_enemy.colliderect(game.bullet) and isalive:
-    #             game.bullet_fired = False
-    #             game.bullet.y = game.player.centery
-    #             game.enemies[enemy] = (rect_enemy, False)
-
     if bullet_obj.bullet_fired:
         for enemy in enemy_obj.enemies:
             rect_enemy = enemy[0]
