@@ -44,6 +44,10 @@ class Game:
         self.bullet_speed = 5
         self.bullet_fired = False
 
+        # Score
+        self.score = 0
+        self.lives = 3
+
     def render_enemy(self):
         """
         Helper to create a list of enemy objects (Rectangles) on screen.
@@ -64,22 +68,6 @@ class Game:
                 return enemies
             counter += 1
 
-    # def movement(self):
-    #     """
-    #     Helper function for jagged enemy movement.
-    #     :return: None
-    #     """
-    #     self.enemy_update_counter += 1
-    #     if self.enemy_update_counter >= self.enemy_update_delay:
-    #         self.enemy_update_counter = 0
-    #         for enemy, isalive in self.enemies.values():
-    #             enemy.x += self.enemy_speed
-    #             if enemy.left < 0:
-    #                 enemy.x = 0
-    #                 self.enemy_speed = abs(self.enemy_speed)
-    #             elif enemy.right >= SURFACE_WIDTH:
-    #                 enemy.right = SURFACE_WIDTH
-    #                 self.enemy_speed = -abs(self.enemy_speed)
     def movement(self):
         """
         Helper function for jagged enemy movement.
@@ -112,7 +100,7 @@ class Game:
                     enemy_rect = info[0]
                     enemy_rect.y += 10
 
-    def firebullet(self):
+    def fire_bullet(self):
         """
         Helper function to fire a bullet from the player object.
         :return: None
@@ -142,9 +130,19 @@ class Game:
                     # Remove enemy from list
                     self.enemies[enemy] = (rect_enemy, False)
 
+    def scorebar(self):
+        pass
+
+    def game_over(self):
+        pass
+
     def run(self):
         # game loop to display window
         while True:
+            if self.lives == 0:
+                pygame.quit()
+                sys.exit()
+
             # Check for events
             for event in pygame.event.get():
                 # QUIT event
@@ -163,15 +161,15 @@ class Game:
             # Render objects
             pygame.draw.rect(self.display, (255, 255, 255), self.player)
             pygame.draw.rect(self.display, (0, 255, 0), self.bullet)
-            # Todo: Needs to have a separate render enemy function that renders list of enemies
             for enemy, isalive in self.enemies.values():
                 color = (255, 0, 0) if isalive else (0, 0, 0)
                 if isalive:
                     pygame.draw.rect(self.display, color, enemy)
             # # Update every enemy's position
             self.movement()
-            self.firebullet()
+            self.fire_bullet()
             self.collision()
+            self.game_over()
 
             # Blit display to screen
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
