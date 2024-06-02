@@ -26,7 +26,6 @@ class Game:
         # Enemy rectangle (top-left = 20, bottom-left=50, width & height = 20)
         self.enemies = render_enemy()
         self.enemy_speed = 2  # Will move continuously
-        self.alive_enemies = len(self.enemies) * [True]
         # Todo: Reduce frames as difficulty increases
         self.enemy_update_delay = 25  # Number of frames between each movement
         self.enemy_update_counter = 0
@@ -86,10 +85,13 @@ class Game:
             # Render objects
             pygame.draw.rect(self.display, (255, 255, 255), self.player)
             pygame.draw.rect(self.display, (0, 255, 0), self.bullet)
-            for enemy, isalive in self.enemies.values():
-                color = (255, 0, 0) if isalive else (0, 0, 0)
-                if isalive:
-                    pygame.draw.rect(self.display, color, enemy)
+            # for enemy, isalive in self.enemies.values():
+            #     color = (255, 0, 0) if isalive else (0, 0, 0)
+            #     if isalive:
+            #         pygame.draw.rect(self.display, color, enemy)
+            for enemy in self.enemies:
+                color = (255, 0, 0) if enemy[1] else (0, 0, 0)
+                pygame.draw.rect(self.display, color, enemy[0])
 
             # Object update functions : Check updates.py
             player_movement(game)
