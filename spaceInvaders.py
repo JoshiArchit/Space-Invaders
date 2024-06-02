@@ -72,6 +72,7 @@ class Game:
             # Display player and enemy on display
             pygame.draw.rect(self.display, (255, 255, 255), self.player)
             pygame.draw.rect(self.display, (255, 0, 0), self.enemy)
+            # Todo: Needs to have a separate render enemy function that renders list of enemies
             # Update enemy movement
             self.movement()
 
