@@ -85,7 +85,7 @@ def collision(bullet_obj, enemy_obj, player_obj):
     return 0
 
 
-def render_enemy():
+def render_enemy(waves):
     """
     Helper to create a list of enemy objects (Rectangles) on screen.
     The list will have gaps between each enemy.
@@ -97,9 +97,8 @@ def render_enemy():
     enemy_y = 50
     enemy_x = 15
     index = 0
-    rows = 5
 
-    while rows > 0:
+    while waves > 0:
         while True:
             enemies.append((pygame.Rect(enemy_x, enemy_y, 10, 10), True))
             enemy_x += enemies[index][0].width + 10
@@ -109,8 +108,9 @@ def render_enemy():
             index += 1
         enemy_y += 20
         enemy_x = 15
-        rows -= 1
+        waves -= 1
     return enemies
+
 
 def player_movement(player_obj, bullet_obj):
     """
@@ -127,4 +127,3 @@ def player_movement(player_obj, bullet_obj):
     if not bullet_obj.bullet_fired:
         bullet_obj.bullet.x = player_obj.player.centerx - 2
         bullet_obj.bullet.y = player_obj.player.centery
-
