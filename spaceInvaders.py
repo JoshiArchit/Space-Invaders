@@ -8,8 +8,12 @@ Language : python3
 
 import pygame
 import sys
-from updates import (movement, fire_bullet, collision, scorebar, render_enemy, player_movement,
+from updates import (movement, fire_bullet, collision, render_enemy, player_movement,
                      DISPLAY_WIDTH, DISPLAY_HEIGHT, SURFACE_WIDTH, SURFACE_HEIGHT)
+from entities import Player, Bullet, Enemy
+
+
+
 
 
 class Game:
@@ -23,39 +27,36 @@ class Game:
         self.display = pygame.Surface((SURFACE_WIDTH, SURFACE_HEIGHT))
         self.clock = pygame.time.Clock()
 
-        # Enemy rectangle (top-left = 20, bottom-left=50, width & height = 20)
-        self.enemy_img = pygame.image.load('assets/green.png')
-        self.enemy_img.set_colorkey((0, 0, 0))
-        self.enemy_img = pygame.transform.scale(self.enemy_img, (10, 10))
-        self.enemies = render_enemy()
-        self.enemy_speed = 2  # Will move continuously
-        # Todo: Reduce frames as difficulty increases
-        self.enemy_update_delay = 25  # Number of frames between each movement
-        self.enemy_update_counter = 0
-
         # Player rectangle (top-left = 150, bottom-left = 200, width & height = 20)
-        self.player_img = pygame.image.load('assets/player.png')
-        self.player_img.set_colorkey((0, 0, 0))
-        self.player = self.player_img.get_rect()
-        self.player.width = 30
-        self.player.height = 20
-        self.player.x = 150
-        self.player.y = 200
-        self.player_speed = 5
-        self.move_left = False
-        self.move_right = False
-        # Scale image to player dimensions
-        self.player_img = pygame.transform.scale(self.player_img, (self.player.width, self.player.height))
-
+        self.player_obj = Player()
         # Bullet initialization
-        self.bullet = pygame.Rect(self.player.centerx - 2, self.player.centery, 5,
-                                  self.player.height // 2)
-        self.bullet_speed = 5
-        self.bullet_fired = False
+        self.bullet_obj = Bullet(self.player_obj.player)
+        # Enemy rectangle (top-left = 20, bottom-left=50, width & height = 20)
+        self.enemy_obj = Enemy()
 
-        # Score
+        # Score and lives
         self.score = 0
         self.lives = 3
+
+    def scoreboard(self):
+        """
+        Function to display the score and lives on the screen
+        :return: None
+        """
+        # Create a dedicated surface for the scoreboard
+        score_display = pygame.Surface((DISPLAY_WIDTH, 40))
+        # Light grey background
+        score_display.fill((200, 200, 200))
+        # Font object
+        font = pygame.font.Font(None, 36)
+        # Render text
+        score_text = font.render(f"Score: {game.score}", True, (0, 0, 0))
+        lives_text = font.render(f"Lives: {game.lives}", True, (0, 0, 0))
+        # Blit text to the surface
+        score_display.blit(score_text, (10, 10))
+        score_display.blit(lives_text, (DISPLAY_WIDTH - 150, 10))
+        # Blit the scoreboard to the screen
+        self.screen.blit(score_display, (0, 0))
 
     def run(self):
         # game loop to display window
@@ -73,47 +74,46 @@ class Game:
                 # Bullet fire event
                 # Player movement events
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE and not self.bullet_fired:
-                        self.bullet_fired = True
+                    if event.key == pygame.K_SPACE and not self.bullet_obj.bullet_fired:
+                        self.bullet_obj.bullet_fired = True
                     if event.key == pygame.K_LEFT:
-                        self.move_left = True
+                        self.player_obj.move_left = True
                     elif event.key == pygame.K_RIGHT:
-                        self.move_right = True
+                        self.player_obj.move_right = True
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:
-                        self.move_left = False
+                        self.player_obj.move_left = False
                     elif event.key == pygame.K_RIGHT:
-                        self.move_right = False
+                        self.player_obj.move_right = False
 
                 # Todo: Movement code
 
-            # Fill display with black color
+            # Rendering block - Pay attention to the hierarchy of rendering and the objects
             self.display.fill((0, 0, 0))
-
-            self.display.blit(self.player_img, (self.player.x, self.player.y))
-
-            # Draw the player and image in its original size as in the constructor
-            pygame.draw.rect(self.display, (0, 255, 0), self.bullet)
-            # # ORIGINAL enemies dictionary to store enemy objects and alive status
-            # for enemy, isalive in self.enemies.values():
-            #     color = (255, 0, 0) if isalive else (0, 0, 0)
-            #     if isalive:
-            #         pygame.draw.rect(self.display, color, enemy)
-            # for enemy in self.enemies:
-            #     color = (255, 0, 0) if enemy[1] else (0, 0, 0)
-            #     pygame.draw.rect(self.display, color, enemy[0])
-            for enemy in self.enemies:
-                self.display.blit(self.enemy_img, enemy[0])
+            # Blit player and bullet
+            self.display.blit(
+                self.player_obj.player_img,
+                (self.player_obj.player.x, self.player_obj.player.y)
+            )
+            pygame.draw.rect(
+                self.display,
+                (0, 255, 0),
+                self.bullet_obj.bullet
+            )
+            # Blit enemies
+            for enemy in self.enemy_obj.enemies:
+                self.display.blit(self.enemy_obj.enemy_img, enemy[0])
 
             # Object update functions : Check updates.py
-            player_movement(game)
-            movement(game)
-            fire_bullet(game)
-            collision(game)
-            scorebar(game)
+            player_movement(self.player_obj, self.bullet_obj)
+            movement(self.enemy_obj)
+            fire_bullet(self.bullet_obj, self.player_obj)
+            self.score += collision(self.bullet_obj, self.enemy_obj, self.player_obj)
 
             # Blit display to screen
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
+            # Local functions
+            self.scoreboard()
             # Update display and cap refresh rate
             pygame.display.update()
             self.clock.tick(60)
