@@ -87,7 +87,6 @@ class Game:
             (0, 255, 0),
             self.bullet_obj.bullet
         )
-        # Todo: Different enemy images for each wave
         # Get starting indexes for each wave
         enemy_per_wave = len(self.enemy_obj.enemies) // self.enemy_obj.waves
         row_start = [i * enemy_per_wave for i in range(self.enemy_obj.waves)]
