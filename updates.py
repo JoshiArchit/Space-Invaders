@@ -96,15 +96,21 @@ def render_enemy():
     enemies = list()
     enemy_y = 50
     enemy_x = 15
-    counter = 0
-    while True:
-        enemies.append((pygame.Rect(enemy_x, enemy_y, 10, 10), True))
-        enemy_x += enemies[counter][0].width + 10
-        if enemy_x >= SURFACE_WIDTH or enemies[counter][0].right > SURFACE_WIDTH:
-            enemies.pop(counter)
-            return enemies
-        counter += 1
+    index = 0
+    rows = 5
 
+    while rows > 0:
+        while True:
+            enemies.append((pygame.Rect(enemy_x, enemy_y, 10, 10), True))
+            enemy_x += enemies[index][0].width + 10
+            if enemy_x >= SURFACE_WIDTH or enemies[index][0].right > SURFACE_WIDTH:
+                enemies.pop(index)
+                break
+            index += 1
+        enemy_y += 20
+        enemy_x = 15
+        rows -= 1
+    return enemies
 
 def player_movement(player_obj, bullet_obj):
     """
