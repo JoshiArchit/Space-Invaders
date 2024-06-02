@@ -29,7 +29,7 @@ class Player:
 
 
 class Enemy:
-    def __init__(self):
+    def __init__(self, waves=3):
         # Enemy rectangle (top-left = 20, bottom-left=50, width & height = 20)
         self.assets = {
             '1': pygame.image.load('assets/green.png'),
@@ -39,11 +39,11 @@ class Enemy:
         self.width, self.height = 10, 10
         self.enemy_img = self.assets['1']
         self.enemy_img.set_colorkey((0, 0, 0))
-        self.waves = 4
+        self.waves = waves
         self.enemies = render_enemy(self.waves)
         self.enemy_speed = 2  # Will move continuously
         # Todo: Reduce frames as difficulty increases
-        self.enemy_update_delay = 25  # Number of frames between each movement
+        self.enemy_update_delay = 10  # Number of frames between each movement
         self.enemy_update_counter = 0
         self.current_type = 1
 
@@ -65,5 +65,5 @@ class Enemy:
 class Bullet:
     def __init__(self, player):
         self.bullet = pygame.Rect(player.centerx - 2, player.centery, 5, player.height // 2)
-        self.bullet_speed = 5
+        self.bullet_speed = 10
         self.bullet_fired = False
