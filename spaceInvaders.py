@@ -24,6 +24,9 @@ class Game:
         self.clock = pygame.time.Clock()
 
         # Enemy rectangle (top-left = 20, bottom-left=50, width & height = 20)
+        self.enemy_img = pygame.image.load('assets/green.png')
+        self.enemy_img.set_colorkey((0, 0, 0))
+        self.enemy_img = pygame.transform.scale(self.enemy_img, (10, 10))
         self.enemies = render_enemy()
         self.enemy_speed = 2  # Will move continuously
         # Todo: Reduce frames as difficulty increases
@@ -31,10 +34,18 @@ class Game:
         self.enemy_update_counter = 0
 
         # Player rectangle (top-left = 150, bottom-left = 200, width & height = 20)
-        self.player = pygame.Rect(150, 200, 25, 15)
+        self.player_img = pygame.image.load('assets/player.png')
+        self.player_img.set_colorkey((0, 0, 0))
+        self.player = self.player_img.get_rect()
+        self.player.width = 30
+        self.player.height = 20
+        self.player.x = 150
+        self.player.y = 200
         self.player_speed = 5
         self.move_left = False
         self.move_right = False
+        # Scale image to player dimensions
+        self.player_img = pygame.transform.scale(self.player_img, (self.player.width, self.player.height))
 
         # Bullet initialization
         self.bullet = pygame.Rect(self.player.centerx - 2, self.player.centery, 5,
@@ -45,9 +56,6 @@ class Game:
         # Score
         self.score = 0
         self.lives = 3
-
-    def game_over(self):
-        pass
 
     def run(self):
         # game loop to display window
@@ -82,17 +90,20 @@ class Game:
             # Fill display with black color
             self.display.fill((0, 0, 0))
 
-            # Render objects
-            pygame.draw.rect(self.display, (255, 255, 255), self.player)
+            self.display.blit(self.player_img, (self.player.x, self.player.y))
+
+            # Draw the player and image in its original size as in the constructor
             pygame.draw.rect(self.display, (0, 255, 0), self.bullet)
             # # ORIGINAL enemies dictionary to store enemy objects and alive status
             # for enemy, isalive in self.enemies.values():
             #     color = (255, 0, 0) if isalive else (0, 0, 0)
             #     if isalive:
             #         pygame.draw.rect(self.display, color, enemy)
+            # for enemy in self.enemies:
+            #     color = (255, 0, 0) if enemy[1] else (0, 0, 0)
+            #     pygame.draw.rect(self.display, color, enemy[0])
             for enemy in self.enemies:
-                color = (255, 0, 0) if enemy[1] else (0, 0, 0)
-                pygame.draw.rect(self.display, color, enemy[0])
+                self.display.blit(self.enemy_img, enemy[0])
 
             # Object update functions : Check updates.py
             player_movement(game)
