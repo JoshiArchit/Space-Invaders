@@ -27,7 +27,6 @@ class Game:
         self.clock = pygame.time.Clock()
 
         # Enemy rectangle (top-left = 20, bottom-left=50, width & height = 20)
-        # self.enemy = pygame.Rect(10, 50, 20, 20)
         self.enemies = self.render_enemy()
         self.enemy_speed = 2  # Will move continuously
         # Todo: Reduce frames as difficulty increases
@@ -57,23 +56,6 @@ class Game:
             enemies.append(enemy)
             next_enemy_x = enemy.right + 10
         return enemies
-
-    # def movement(self):
-    #     """
-    #     Helper function for jagged enemy movement.
-    #
-    #     :return: None
-    #     """
-    #     self.enemy_update_counter += 1
-    #     if self.enemy_update_counter >= self.enemy_update_delay:
-    #         self.enemy_update_counter = 0
-    #         self.enemy.x += self.enemy_speed
-    #         if self.enemy.left < 0:
-    #             self.enemy.x = 0
-    #             self.enemy_speed = abs(self.enemy_speed)
-    #         elif self.enemy.right >= SURFACE_WIDTH:
-    #             self.enemy.right = SURFACE_WIDTH
-    #             self.enemy_speed = -abs(self.enemy_speed)
 
     def movement(self):
         """
