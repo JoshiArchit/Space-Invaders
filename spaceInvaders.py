@@ -64,18 +64,22 @@ class Game:
                 return enemies
             counter += 1
 
-
-        # enemy = pygame.Rect(15, 50, 10, 10)
-        # next_enemy_x = enemy.right + 10
-        # while next_enemy_x < SURFACE_WIDTH:
-        #     enemy = pygame.Rect(next_enemy_x, 50, 10, 10)
-        #     # Return if last enemy goes out of bounds
-        #     if enemy.right >= SURFACE_WIDTH:
-        #         return enemies
-        #     enemies.append(enemy)
-        #     next_enemy_x = enemy.right + 10
-        # return enemies
-
+    # def movement(self):
+    #     """
+    #     Helper function for jagged enemy movement.
+    #     :return: None
+    #     """
+    #     self.enemy_update_counter += 1
+    #     if self.enemy_update_counter >= self.enemy_update_delay:
+    #         self.enemy_update_counter = 0
+    #         for enemy, isalive in self.enemies.values():
+    #             enemy.x += self.enemy_speed
+    #             if enemy.left < 0:
+    #                 enemy.x = 0
+    #                 self.enemy_speed = abs(self.enemy_speed)
+    #             elif enemy.right >= SURFACE_WIDTH:
+    #                 enemy.right = SURFACE_WIDTH
+    #                 self.enemy_speed = -abs(self.enemy_speed)
     def movement(self):
         """
         Helper function for jagged enemy movement.
@@ -84,14 +88,29 @@ class Game:
         self.enemy_update_counter += 1
         if self.enemy_update_counter >= self.enemy_update_delay:
             self.enemy_update_counter = 0
-            for enemy in self.enemies:
-                enemy.x += self.enemy_speed
-                if enemy.left < 0:
-                    enemy.x = 0
-                    self.enemy_speed = abs(self.enemy_speed)
-                elif enemy.right >= SURFACE_WIDTH:
-                    enemy.right = SURFACE_WIDTH
-                    self.enemy_speed = -abs(self.enemy_speed)
+
+            # Check the leftmost and rightmost enemies
+            leftmost_enemy = self.enemies[min(self.enemies.keys())][0]
+            rightmost_enemy = self.enemies[max(self.enemies.keys())][0]
+
+            # Doesnt matter if they are alive or dead. They will move together. Alive or dead is
+            # handled in collision
+            for enemy, info in self.enemies.items():
+                enemy_rect = info[0]  # Rect object is the first element in the tuple
+                enemy_rect.x += self.enemy_speed
+
+            # Check if the leftmost enemy has hit the left wall
+            if leftmost_enemy.left <= 0:
+                self.enemy_speed = abs(self.enemy_speed)
+                for enemy, info in self.enemies.items():
+                    enemy_rect = info[0]
+                    enemy_rect.y += 10
+            # Check if the rightmost enemy has hit the right wall
+            elif rightmost_enemy.right >= SURFACE_WIDTH:
+                self.enemy_speed = -abs(self.enemy_speed)
+                for enemy, info in self.enemies.items():
+                    enemy_rect = info[0]
+                    enemy_rect.y += 10
 
     def firebullet(self):
         """
@@ -115,16 +134,13 @@ class Game:
         :return: None
         """
         if self.bullet_fired:
-            for enemy in self.enemies:
-                # Check collision only if bullet was fired
-                if enemy.colliderect(self.bullet) and self.alive_enemies[self.enemies.index(enemy)]:
-                    # Set the index of the enemy to False
-                    self.alive_enemies[self.enemies.index(enemy)] = False
-                    # Set enemy color to background
-                    enemy.color = (0, 0, 0)
+            for enemy, enemy_info in self.enemies.items():
+                rect_enemy, isalive = enemy_info
+                if rect_enemy.colliderect(self.bullet) and isalive:
                     self.bullet_fired = False
-                    # Reset bullet position
                     self.bullet.y = self.player.centery
+                    # Remove enemy from list
+                    self.enemies[enemy] = (rect_enemy, False)
 
     def run(self):
         # game loop to display window
@@ -148,12 +164,14 @@ class Game:
             pygame.draw.rect(self.display, (255, 255, 255), self.player)
             pygame.draw.rect(self.display, (0, 255, 0), self.bullet)
             # Todo: Needs to have a separate render enemy function that renders list of enemies
-            for enemy in self.enemies.values():
-                pygame.draw.rect(self.display, (255, 0, 0), enemy[0])
+            for enemy, isalive in self.enemies.values():
+                color = (255, 0, 0) if isalive else (0, 0, 0)
+                if isalive:
+                    pygame.draw.rect(self.display, color, enemy)
             # # Update every enemy's position
-            # self.movement()
-            # self.firebullet()
-            # self.collision()
+            self.movement()
+            self.firebullet()
+            self.collision()
 
             # Blit display to screen
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
