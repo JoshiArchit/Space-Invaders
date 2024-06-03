@@ -20,7 +20,8 @@ class Game:
     Class to initialize the game window, objects and run the game loop.
     """
 
-    def __init__(self, current_waves=3, current_enemies_per_wave=8):
+    def __init__(self, current_waves=3, current_enemies_per_wave=8, current_score=0,
+                 current_lives=3):
         """
         Initialize the game window, objects and variables. Instantiate the player, bullet and enemy
         objects from the entities class.
@@ -49,8 +50,8 @@ class Game:
         print("Current waves = ", current_waves)
 
         # Score and lives
-        self.score = 0
-        self.lives = 3
+        self.score = current_score
+        self.lives = current_lives
 
     def scoreboard(self):
         """
@@ -65,8 +66,8 @@ class Game:
         # Font object
         font = pygame.font.Font(None, 36)
         # Render text
-        score_text = font.render(f"Score: {game.score}", True, (0, 0, 0))
-        lives_text = font.render(f"Lives: {game.lives}", True, (0, 0, 0))
+        score_text = font.render(f"Score: {self.score}", True, (0, 0, 0))
+        lives_text = font.render(f"Lives: {self.lives}", True, (0, 0, 0))
         # Blit text to the surface
         score_display.blit(score_text, (10, 10))
         score_display.blit(lives_text, (DISPLAY_WIDTH - 150, 10))
@@ -85,14 +86,14 @@ class Game:
                 pygame.quit()
                 exit()
             # Key press events - Space to fire bullet, Left and Right to move player
-            if event.type == pygame.KEYDOWN:        # Key press events
+            if event.type == pygame.KEYDOWN:  # Key press events
                 if event.key == pygame.K_SPACE and not self.bullet_obj.bullet_fired:
                     self.bullet_obj.bullet_fired = True
                 if event.key == pygame.K_LEFT:
                     self.player_obj.move_left = True
                 elif event.key == pygame.K_RIGHT:
                     self.player_obj.move_right = True
-            if event.type == pygame.KEYUP:          # Key release events
+            if event.type == pygame.KEYUP:  # Key release events
                 if event.key == pygame.K_LEFT:
                     self.player_obj.move_left = False
                 elif event.key == pygame.K_RIGHT:
@@ -198,38 +199,49 @@ class Game:
 def playgame(new_game):
     """
     Main game function to run the game loop. If player wins, prompt to play next level. If player
-    loses, prompt to play again or exit the game.
+    loses, prompt to play again or exit the game. Loop until the player decides to exit the game.
 
     :param new_game: Game object
     :return: None
     """
-    lives = new_game.run()      # Run the game loop and get the number of lives left
-
-    # Get current wave and enemies per wave
-    current_waves = new_game.enemy_obj.waves
-    current_enemies_per_wave = new_game.enemy_obj.num_enemies_per_wave
-
-    # Decision loop to determine next course of action after game ends/player wins
-    while lives > 0 or lives == -1:
-        if lives == -1:
-            # Player has won check if they want to play next level
-            play_next = utils.winner(new_game)
-            if play_next:
-                # Increase difficulty for next level and run the game loop
-                new_game = Game(current_waves=current_waves + 1,
-                                current_enemies_per_wave=current_enemies_per_wave + 3)
-                lives = new_game.run()
-        else:
-            # Give choice to play current level again
+    while True:
+        lives = new_game.run()  # Run the game loop and get the number of lives left
+        print("Lives = ", lives)
+        start_score = new_game.num_enemies_per_wave * new_game.waves
+        if lives > 0:
+            # Player lost but has lives left, prompt to retry or exit
             choice = utils.try_again(new_game)
             if choice:
-                # Retry the game with same difficulty
-                retry_game = Game(current_waves, current_enemies_per_wave)
-                lives = retry_game.run()
+                # Retry the game with the same difficulty
+                new_game = Game(new_game.enemy_obj.waves, new_game.enemy_obj.num_enemies_per_wave,
+                                current_score=start_score, current_lives=lives)
             else:
                 utils.goodbye()
                 pygame.quit()
                 sys.exit()
+        elif lives == 0:
+            # Player lost and has no lives left, prompt to retry or exit
+            choice = utils.try_again(new_game)
+            if choice:
+                # Start a new game from the beginning
+                new_game = Game()
+            else:
+                utils.goodbye()
+                pygame.quit()
+                sys.exit()
+        elif lives == -1:
+            # Player won, prompt to play the next level
+            play_next = utils.winner(new_game)
+            if play_next:
+                # Increase difficulty for the next level
+                new_game = Game(current_waves=new_game.enemy_obj.waves + 1,
+                                current_enemies_per_wave=new_game.enemy_obj.num_enemies_per_wave + 3,
+                                current_score=new_game.score, current_lives=new_game.lives)
+            else:
+                utils.goodbye()
+                pygame.quit()
+                sys.exit()
+        print("New lives = ", new_game.lives)
 
 
 if __name__ == '__main__':
