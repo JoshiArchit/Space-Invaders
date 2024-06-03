@@ -23,16 +23,17 @@ class Player:
         self.player_img = pygame.image.load('assets/player.png')
         self.player_img.set_colorkey((0, 0, 0))
         self.player = self.player_img.get_rect()
-        # Scale the image to the required dimensions
-        self.player_img = pygame.transform.scale(
-            self.player_img,
-            (self.player.width, self.player.height))
 
         # Player dimensions
         self.player.width = 30
         self.player.height = 20
         self.player.x = 150
         self.player.y = 200
+
+        # Scale the image to the required dimensions
+        self.player_img = pygame.transform.scale(
+            self.player_img,
+            (self.player.width, self.player.height))
 
         # Player motion
         self.player_speed = 5
@@ -69,8 +70,8 @@ class Enemy:
         self.enemies = render_enemy(self.waves, self.num_enemies_per_wave)
         self.enemy_speed = 2  # Will move continuously
         # Todo: Reduce frames as difficulty increases
-        self.enemy_update_delay = 10  # Number of frames between each movement
-        self.enemy_update_counter = 0
+        self.enemy_update_delay = 1  # Number of frames between each movement
+        self.enemy_update_counter = 10
         self.current_type = 1
 
     def render(self, enemy_obj):
