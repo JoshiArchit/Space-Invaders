@@ -123,12 +123,18 @@ class Game:
         row_start = [i * enemy_per_wave for i in range(self.enemy_obj.waves)]
 
         # Blit enemies
+        # for enemy in self.enemy_obj.enemies:
+        #     # If end of current wave is reached, print DONE before moving to next row
+        #     if self.enemy_obj.enemies.index(enemy) in row_start:
+        #         # Cycle through enemy types and render different sprite
+        #         self.enemy_obj.enemy_img = self.enemy_obj.render(self.enemy_obj)
+        #     self.display.blit(self.enemy_obj.enemy_img, enemy[0])
+        # Blit each enemy with its sprite
         for enemy in self.enemy_obj.enemies:
-            # If end of current wave is reached, print DONE before moving to next row
-            if self.enemy_obj.enemies.index(enemy) in row_start:
-                # Cycle through enemy types and render different sprite
-                self.enemy_obj.enemy_img = self.enemy_obj.render(self.enemy_obj)
-            self.display.blit(self.enemy_obj.enemy_img, enemy[0])
+            # Scale the image to the required dimensions
+            enemy[1] = pygame.transform.scale(enemy[1], (10, 10))
+
+            self.display.blit(enemy[1], enemy[0])
 
     def gameover(self):
         """
@@ -206,8 +212,10 @@ def playgame(new_game):
     """
     while True:
         lives = new_game.run()  # Run the game loop and get the number of lives left
+        current_waves = new_game.enemy_obj.waves
+        current_enemies_per_wave = new_game.enemy_obj.num_enemies_per_wave
         print("Lives = ", lives)
-        start_score = new_game.num_enemies_per_wave * new_game.waves
+        start_score = current_waves * current_enemies_per_wave
         if lives > 0:
             # Player lost but has lives left, prompt to retry or exit
             choice = utils.try_again(new_game)
@@ -234,8 +242,8 @@ def playgame(new_game):
             play_next = utils.winner(new_game)
             if play_next:
                 # Increase difficulty for the next level
-                new_game = Game(current_waves=new_game.enemy_obj.waves + 1,
-                                current_enemies_per_wave=new_game.enemy_obj.num_enemies_per_wave + 3,
+                new_game = Game(current_waves=current_waves + 1,
+                                current_enemies_per_wave=current_enemies_per_wave + 3,
                                 current_score=new_game.score, current_lives=new_game.lives)
             else:
                 utils.goodbye()
