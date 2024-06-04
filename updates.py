@@ -14,6 +14,45 @@ SURFACE_WIDTH = 320
 SURFACE_HEIGHT = 240
 
 
+# def movement(enemy_obj):
+#     """
+#     Helper function to move the enemies left and right. If the leftmost enemy hits the left wall,
+#     the enemies will move down and change direction. If the rightmost enemy hits the right wall,
+#     the enemies will move down and change direction. In case of absent enemies in the list, the
+#     function will account for the absence and move the enemies to the extremes by calculating new
+#     bounds.
+#
+#     To demonstrate jagged movement, the positions of the enemies are updated every 10 frames.
+#
+#     :param enemy_obj: List of active enemies on screen.
+#     :return: None
+#     """
+#     enemy_obj.enemy_update_counter += 1
+#     if enemy_obj.enemy_update_counter >= enemy_obj.enemy_update_delay:
+#         enemy_obj.enemy_update_counter = 0
+#
+#         # Check the leftmost and rightmost enemies
+#         leftmost_enemy = enemy_obj.enemies[0][0]
+#         rightmost_enemy = enemy_obj.enemies[len(enemy_obj.enemies) - 1][0]
+#
+#         # Use left_most and right_most to calculate bounds for the row
+#         left_most = leftmost_enemy.left
+#         right_most = rightmost_enemy.right
+#
+#         # Check if the leftmost enemy has hit the left wall
+#         if left_most <= 0:
+#             enemy_obj.enemy_speed = abs(enemy_obj.enemy_speed)
+#             for enemy_rect in enemy_obj.enemies:
+#                 enemy_rect[0].y += enemy_obj.enemy_speed
+#         # Check if the rightmost enemy has hit the right wall
+#         elif right_most >= SURFACE_WIDTH:
+#             enemy_obj.enemy_speed = -abs(enemy_obj.enemy_speed)
+#             for enemy_rect in enemy_obj.enemies:
+#                 enemy_rect[0].y -= enemy_obj.enemy_speed
+#
+#         # Move all enemies
+#         for enemy in enemy_obj.enemies:
+#             enemy[0].x += enemy_obj.enemy_speed
 def movement(enemy_obj):
     """
     Helper function to move the enemies left and right. If the leftmost enemy hits the left wall,
@@ -24,7 +63,7 @@ def movement(enemy_obj):
 
     To demonstrate jagged movement, the positions of the enemies are updated every 10 frames.
 
-    :param enemy_obj: List of active enemies on screen.
+    :param enemy_obj: Enemy object containing list of active enemies and movement properties.
     :return: None
     """
     enemy_obj.enemy_update_counter += 1
@@ -32,28 +71,26 @@ def movement(enemy_obj):
         enemy_obj.enemy_update_counter = 0
 
         # Check the leftmost and rightmost enemies
-        leftmost_enemy = enemy_obj.enemies[0][0]
-        rightmost_enemy = enemy_obj.enemies[len(enemy_obj.enemies) - 1][0]
+        if not enemy_obj.enemies:
+            return
 
-        # Use left_most and right_most to calculate bounds for the row
-        left_most = leftmost_enemy.left
-        right_most = rightmost_enemy.right
+        leftmost_enemy = min(enemy_obj.enemies, key=lambda e: e[0].left)[0]
+        rightmost_enemy = max(enemy_obj.enemies, key=lambda e: e[0].right)[0]
 
         # Check if the leftmost enemy has hit the left wall
-        if left_most <= 0:
+        if leftmost_enemy.left <= 0:
             enemy_obj.enemy_speed = abs(enemy_obj.enemy_speed)
-            for enemy_rect in enemy_obj.enemies:
-                enemy_rect[0].y += enemy_obj.enemy_speed
+            for enemy in enemy_obj.enemies:
+                enemy[0].y += 10  # Move down by a fixed step
         # Check if the rightmost enemy has hit the right wall
-        elif right_most >= SURFACE_WIDTH:
+        elif rightmost_enemy.right >= SURFACE_WIDTH:
             enemy_obj.enemy_speed = -abs(enemy_obj.enemy_speed)
-            for enemy_rect in enemy_obj.enemies:
-                enemy_rect[0].y -= enemy_obj.enemy_speed
+            for enemy in enemy_obj.enemies:
+                enemy[0].y += 10  # Move down by a fixed step
 
-        # Move all enemies
+        # Move all enemies horizontally
         for enemy in enemy_obj.enemies:
             enemy[0].x += enemy_obj.enemy_speed
-
 
 def fire_bullet(bullet_obj, player_obj):
     """
@@ -96,36 +133,15 @@ def collision(bullet_obj, enemy_obj, player_obj):
     return 0, False
 
 
-# def render_enemy(waves):
-#     """
-#     Helper to create a list of enemy objects (Rectangles) on screen.
-#     The list will have gaps between each enemy.
-#     If collision is detected, remove the enemy from the list.
-#     :return:
-#     """
-#     # List of enemies
-#     enemies = list()
-#     enemy_y = 50
-#     enemy_x = 15
-#     index = 0
-#
-#     while waves > 0:
-#         while True:
-#             enemies.append((pygame.Rect(enemy_x, enemy_y, 10, 10), True))
-#             enemy_x += enemies[index][0].width + 10
-#             if enemy_x >= SURFACE_WIDTH or enemies[index][0].right > SURFACE_WIDTH:
-#                 enemies.pop(index)
-#                 break
-#             index += 1
-#         enemy_y += 20
-#         enemy_x = 15
-#         waves -= 1
-#     return enemies
-def render_enemy(waves, num_enemies_per_wave):
+def render_enemy(waves, num_enemies_per_wave, assets):
     """
     Helper to create a list of enemy objects (Rectangles) on screen.
     The list will have gaps between each enemy.
     If collision is detected, remove the enemy from the list.
+
+    :param waves: Number of waves in the current level
+    :param num_enemies_per_wave: Number of enemies in each wave
+    :param assets: Dictionary of enemy sprites
     :return:
     """
     # List of enemies
@@ -133,17 +149,36 @@ def render_enemy(waves, num_enemies_per_wave):
     enemy_y = 50
     enemy_x = 15
     index = 0
+    enemy_types = len(assets)
 
+    # while waves > 0:
+    #     pointer = num_enemies_per_wave
+    #     while pointer > 0:
+    #         enemies.append((pygame.Rect(enemy_x, enemy_y, 10, 10), True))
+    #         enemy_x += enemies[index][0].width + 10
+    #         if enemy_x >= SURFACE_WIDTH or enemies[index][0].right > SURFACE_WIDTH:
+    #             enemies.pop(index)
+    #             break
+    #         index += 1
+    #         pointer -= 1
+    #     enemy_y += 20
+    #     enemy_x = 15
+    #     waves -= 1
+    # return enemies
     while waves > 0:
         pointer = num_enemies_per_wave
+        current_type = 1
         while pointer > 0:
-            enemies.append((pygame.Rect(enemy_x, enemy_y, 10, 10), True))
-            enemy_x += enemies[index][0].width + 10
-            if enemy_x >= SURFACE_WIDTH or enemies[index][0].right > SURFACE_WIDTH:
+            enemy_rect = pygame.Rect(enemy_x, enemy_y, 10, 10)
+            enemy_sprite = assets[str(current_type)]
+            enemies.append([enemy_rect, enemy_sprite])
+            enemy_x += enemy_rect.width + 10
+            if enemy_x >= SURFACE_WIDTH or enemy_rect.right > SURFACE_WIDTH:
                 enemies.pop(index)
                 break
             index += 1
             pointer -= 1
+            current_type = (current_type % enemy_types) + 1  # Cycle through enemy types
         enemy_y += 20
         enemy_x = 15
         waves -= 1
