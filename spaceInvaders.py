@@ -118,18 +118,6 @@ class Game:
             self.bullet_obj.bullet
         )
 
-        # Get starting indexes for each wave
-        enemy_per_wave = len(self.enemy_obj.enemies) // self.enemy_obj.waves
-        row_start = [i * enemy_per_wave for i in range(self.enemy_obj.waves)]
-
-        # Blit enemies
-        # for enemy in self.enemy_obj.enemies:
-        #     # If end of current wave is reached, print DONE before moving to next row
-        #     if self.enemy_obj.enemies.index(enemy) in row_start:
-        #         # Cycle through enemy types and render different sprite
-        #         self.enemy_obj.enemy_img = self.enemy_obj.render(self.enemy_obj)
-        #     self.display.blit(self.enemy_obj.enemy_img, enemy[0])
-        # Blit each enemy with its sprite
         for enemy in self.enemy_obj.enemies:
             # Scale the image to the required dimensions
             enemy[1] = pygame.transform.scale(enemy[1], (10, 10))

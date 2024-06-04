@@ -14,45 +14,6 @@ SURFACE_WIDTH = 320
 SURFACE_HEIGHT = 240
 
 
-# def movement(enemy_obj):
-#     """
-#     Helper function to move the enemies left and right. If the leftmost enemy hits the left wall,
-#     the enemies will move down and change direction. If the rightmost enemy hits the right wall,
-#     the enemies will move down and change direction. In case of absent enemies in the list, the
-#     function will account for the absence and move the enemies to the extremes by calculating new
-#     bounds.
-#
-#     To demonstrate jagged movement, the positions of the enemies are updated every 10 frames.
-#
-#     :param enemy_obj: List of active enemies on screen.
-#     :return: None
-#     """
-#     enemy_obj.enemy_update_counter += 1
-#     if enemy_obj.enemy_update_counter >= enemy_obj.enemy_update_delay:
-#         enemy_obj.enemy_update_counter = 0
-#
-#         # Check the leftmost and rightmost enemies
-#         leftmost_enemy = enemy_obj.enemies[0][0]
-#         rightmost_enemy = enemy_obj.enemies[len(enemy_obj.enemies) - 1][0]
-#
-#         # Use left_most and right_most to calculate bounds for the row
-#         left_most = leftmost_enemy.left
-#         right_most = rightmost_enemy.right
-#
-#         # Check if the leftmost enemy has hit the left wall
-#         if left_most <= 0:
-#             enemy_obj.enemy_speed = abs(enemy_obj.enemy_speed)
-#             for enemy_rect in enemy_obj.enemies:
-#                 enemy_rect[0].y += enemy_obj.enemy_speed
-#         # Check if the rightmost enemy has hit the right wall
-#         elif right_most >= SURFACE_WIDTH:
-#             enemy_obj.enemy_speed = -abs(enemy_obj.enemy_speed)
-#             for enemy_rect in enemy_obj.enemies:
-#                 enemy_rect[0].y -= enemy_obj.enemy_speed
-#
-#         # Move all enemies
-#         for enemy in enemy_obj.enemies:
-#             enemy[0].x += enemy_obj.enemy_speed
 def movement(enemy_obj):
     """
     Helper function to move the enemies left and right. If the leftmost enemy hits the left wall,
@@ -61,7 +22,8 @@ def movement(enemy_obj):
     function will account for the absence and move the enemies to the extremes by calculating new
     bounds.
 
-    To demonstrate jagged movement, the positions of the enemies are updated every 10 frames.
+    To demonstrate jagged movement, the positions of the enemies are everytime with a value equal to
+    enemy_update_delay parameter in the Enemy class in entities.py.
 
     :param enemy_obj: Enemy object containing list of active enemies and movement properties.
     :return: None
@@ -91,6 +53,7 @@ def movement(enemy_obj):
         # Move all enemies horizontally
         for enemy in enemy_obj.enemies:
             enemy[0].x += enemy_obj.enemy_speed
+
 
 def fire_bullet(bullet_obj, player_obj):
     """

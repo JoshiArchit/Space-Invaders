@@ -71,31 +71,9 @@ class Enemy:
         # Scale the image to the required dimensions
         self.enemy_speed = 2  # Will move continuously
         # Todo: Reduce frames as difficulty increases
-        self.enemy_update_delay = 1  # Number of frames between each movement
+        self.enemy_update_delay = 4  # Number of frames between each movement
         self.enemy_update_counter = 10
         self.current_type = 1
-
-    # def render(self, enemy_obj):
-    #     """
-    #     Function to render the enemy objects on the screen.
-    #
-    #     :param enemy_obj: list of enemy Rect objects
-    #     :return: scaled enemy image
-    #     """
-    #     enemy_types = len(self.assets)
-    #     # Change enemy type after every wave and reset the counter if it exceeds the number of types
-    #     if self.current_type > enemy_types:
-    #         self.current_type = 1
-    #
-    #     if self.current_type <= enemy_types:
-    #         enemy_obj.enemy_img = enemy_obj.assets[str(self.current_type)]
-    #         self.current_type += 1
-    #
-    #     # Scale the image to the required dimensions
-    #     return pygame.transform.scale(
-    #                 enemy_obj.enemy_img,
-    #                 (self.width, self.height)
-    #     )
 
 
 class Bullet:
