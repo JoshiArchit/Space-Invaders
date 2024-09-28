@@ -114,20 +114,6 @@ def render_enemy(waves, num_enemies_per_wave, assets):
     index = 0
     enemy_types = len(assets)
 
-    # while waves > 0:
-    #     pointer = num_enemies_per_wave
-    #     while pointer > 0:
-    #         enemies.append((pygame.Rect(enemy_x, enemy_y, 10, 10), True))
-    #         enemy_x += enemies[index][0].width + 10
-    #         if enemy_x >= SURFACE_WIDTH or enemies[index][0].right > SURFACE_WIDTH:
-    #             enemies.pop(index)
-    #             break
-    #         index += 1
-    #         pointer -= 1
-    #     enemy_y += 20
-    #     enemy_x = 15
-    #     waves -= 1
-    # return enemies
     while waves > 0:
         pointer = num_enemies_per_wave
         current_type = 1
@@ -139,9 +125,11 @@ def render_enemy(waves, num_enemies_per_wave, assets):
             if enemy_x >= SURFACE_WIDTH or enemy_rect.right > SURFACE_WIDTH:
                 enemies.pop(index)
                 break
+            # Move to next enemy
             index += 1
             pointer -= 1
             current_type = (current_type % enemy_types) + 1  # Cycle through enemy types
+        # Move to next row
         enemy_y += 20
         enemy_x = 15
         waves -= 1
